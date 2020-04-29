@@ -1,29 +1,44 @@
 import React from 'react';
-import PropTypes from "prop-types";
 import axios from "axios";
+import Movie from "./Movies";
 
 //** function component가 있는데 class component를 사용해야 하나?? >>> state 라고 불리는 녀석 때문이다.
 class App extends React.Component{
 	state = {
-		isLoading : true
+		isLoading : true,
+		movies : []
 	};
 
 	getMovies = async () => {
-		const movies = await axios.get("https://yts-proxy.now.sh/list_movies.json");
-		console.log(movies);
+		const {
+			data : {
+				data : {movies}
+			}
+		} = await axios.get("https://yts-proxy.now.sh/list_movies.json");
+		this.setState({movies, isLoading:false});
 	};
 
 	componentDidMount(){
-		setTimeout(()=>{
-			this.setState({isLoading : false});
-		}, 6000);
+		// setTimeout(()=>{
+		// 	this.setState({isLoading : false});
+		// }, 6000);
 
 		this.getMovies();
 	}
 
 	render(){
-		const { isLoading } = this.state;
-		return <div>{isLoading ? "Loading...." : "We are ready"}</div>;
+		const { isLoading, movies } = this.state;
+		return <div>{isLoading ? "Loading...." : movies.map(movie => {
+			console.log(movie)
+			return <Movie 
+						key={movie.id}
+						id={movie.id} 
+						year={movie.year} 
+						title={movie.title} 
+						summary={movie.sumary} 
+						poster={movie.medium_cover_image}
+					/>
+		})}</div>;
 	}
 }
 
